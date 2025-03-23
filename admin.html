@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Back Button -->
+    <a href="dashboard.html" class="back-button">
+        <span class="back-icon">←</span>
+        Back to Dashboard
+    </a>
+
+    <!-- PIN Verification Modal -->
+    <div id="pinModal" class="modal">
+        <div class="modal-content">
+            <h2>Enter Admin PIN</h2>
+            <input type="password" id="pinInput" placeholder="Enter PIN" maxlength="4">
+            <button onclick="verifyPin()">Verify</button>
+        </div>
+    </div>
+
+    <!-- Admin Content (Initially Hidden) -->
+    <div id="adminContent" style="display: none;">
+        <div id="admin">
+            <h1>Admin</h1>
+            <div id="uploadSection">
+                <h2>Upload Files</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search files..." onkeyup="searchFiles()">
+                </div>
+                <button onclick="document.getElementById('fileInput').click()">Upload Files</button>
+                <input type="file" id="fileInput" multiple style="display: none;">
+                <table id="uploadedFilesTable">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>File Size (KB)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="uploadedFiles"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="storage.js"></script>
+    <script>
+        // Show PIN modal on page load
+        window.addEventListener('load', function() {
+            document.getElementById('pinModal').style.display = 'block';
+        });
+
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput');
+            const pin = pinInput.value;
+            
+            if (pin === '143') {
+                document.getElementById('pinModal').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                refreshFilesTable();
+            } else {
+                alert('Incorrect PIN. Please try again.');
+                pinInput.value = '';
+            }
+        }
+
+        // Allow only numbers in PIN input
+        document.getElementById('pinInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Handle Enter key in PIN input
+        document.getElementById('pinInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyPin();
+            }
+        });
+
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const files = event.target.files;
+            const uploadedFilesTable = document.getElementById('uploadedFiles');
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const fileData = {
+                        name: file.name,
+                        size: (file.size / 1024).toFixed(2),
+                        content: e.target.result,
+                        type: file.type
+                    };
+                    StorageService.saveFile(fileData);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${fileData.name}</td>
+                        <td>${fileData.size}</td>
+                        <td>
+                            <button onclick="deleteFile('${fileData.name}')" class="delete-btn">Delete</button>
+                        </td>
+                    `;
+                    uploadedFilesTable.appendChild(row);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function deleteFile(fileName) {
+            StorageService.deleteFile(fileName);
+            refreshFilesTable();
+        }
+
+        function searchFiles() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const table = document.getElementById('uploadedFilesTable');
+            const rows = table.getElementsByTagName('tr');
+
+            for (let i = 1; i < rows.length; i++) {
+                const fileNameCell = rows[i].getElementsByTagName('td')[0];
+                if (fileNameCell) {
+                    const fileName = fileNameCell.textContent || fileNameCell.innerText;
+                    if (fileName.toLowerCase().indexOf(filter) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        function refreshFilesTable() {
+            const uploadedFilesTable = document.getElementById('uploadedFiles');
+            uploadedFilesTable.innerHTML = '';
+            
+            const files = StorageService.getFiles();
+            files.forEach(file => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${file.name}</td>
+                    <td>${file.size}</td>
+                    <td>
+                        <button onclick="deleteFile('${file.name}')" class="delete-btn">Delete</button>
+                    </td>
+                `;
+                uploadedFilesTable.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCPO E-File and Tracking System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <h1>BCPO E-File and Tracking System</h1>
+            <div class="header-divider"></div>
+            <p class="header-subtitle">Baguio City</p>
+        </div>
+    </header>
+
+    <div id="auth">
+        <h2 id="authTitle">Login</h2>
+        <div id="loginForm">
+            <input type="text" id="loginUsername" placeholder="Username" onkeypress="handleLoginKeyPress(event)">
+            <input type="password" id="loginPassword" placeholder="Password" onkeypress="handleLoginKeyPress(event)">
+            <button onclick="login()">Login</button>
+        </div>
+        <div id="registerForm" style="display: none;">
+            <input type="text" id="registerUsername" placeholder="Username" onkeypress="handleRegisterKeyPress(event)">
+            <input type="password" id="registerPassword" placeholder="Password" onkeypress="handleRegisterKeyPress(event)">
+            <input type="email" id="registerEmail" placeholder="Email" onkeypress="handleRegisterKeyPress(event)">
+            <button onclick="register()">Register</button>
+        </div>
+        <p>
+            <a href="#" id="toggleAuth" onclick="toggleAuth()">Don't have an account? Register</a>
+        </p>
+        
+        <!-- Contact Details -->
+        <div class="contact-details">
+            <h3>Contact Information</h3>
+            <div class="contact-info">
+                <p><i>📞</i> +63 (34) 434-1234</p>
+                <p><i>📱</i> +63 917-123-4567</p>
+                <p><i>✉️</i> bcpo.efile@police.gov.ph</p>
+                <p><i>📍</i> Bacolod City Police Office, Bacolod City</p>
+            </div>
+        </div>
+    </div>
+    <script src="storage.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
